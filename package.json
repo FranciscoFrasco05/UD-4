@@ -19,6 +19,7 @@
   "homepage": "https://github.com/FranciscoFrasco05/UD-4/issues",
   "dependencies": {
     "express": "^4.21.2",
+    "helmet": "^8.0.0",
     "mongodb": "^6.12.0"
   },
   "devDependencies": {

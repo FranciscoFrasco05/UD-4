@@ -1,11 +1,20 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+//HELMET
+const helmet = require("helmet");
 
 const uri =
   "mongodb+srv://franciscojosesanchezlloret:xzjPV6zXZPpohatw@cluster0.silp3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express();
 app.use(express.json());
+app.use(helmet());
+app.use(
+  helmet({
+    hidePoweredBy: true, // Oculta la cabecera X-Powered-By
+    frameguard: { action: "deny" }, // Previene que tu app sea embebida en un iframe
+  })
+);
 
 const port = process.env.PORT || 8080;
 
@@ -39,7 +48,9 @@ app.get("/concesionarios", async (req, res) => {
     const concesionarios = await concesionariosCollection.find().toArray();
     res.json(concesionarios);
   } catch (err) {
-    res.status(500).json({ message: "Error al obtener los concesionarios", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al obtener los concesionarios", error: err });
   }
 });
 
@@ -50,7 +61,9 @@ app.post("/concesionarios", async (req, res) => {
     const result = await concesionariosCollection.insertOne(nuevoConcesionario);
     res.json({ message: "Concesionario creado", id: result.insertedId });
   } catch (err) {
-    res.status(500).json({ message: "Error al crear el concesionario", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al crear el concesionario", error: err });
   }
 });
 
@@ -65,7 +78,9 @@ app.get("/concesionarios/:id", async (req, res) => {
       res.status(404).json({ message: "Concesionario no encontrado" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Error al obtener el concesionario", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al obtener el concesionario", error: err });
   }
 });
 
@@ -84,7 +99,9 @@ app.put("/concesionarios/:id", async (req, res) => {
       res.status(404).json({ message: "Concesionario no encontrado" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Error al actualizar el concesionario", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al actualizar el concesionario", error: err });
   }
 });
 
@@ -99,7 +116,9 @@ app.delete("/concesionarios/:id", async (req, res) => {
       res.status(404).json({ message: "Concesionario no encontrado" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Error al eliminar el concesionario", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al eliminar el concesionario", error: err });
   }
 });
 
@@ -114,7 +133,9 @@ app.get("/concesionarios/:id/coches", async (req, res) => {
       res.status(404).json({ message: "Concesionario no encontrado" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Error al obtener los coches", error: err });
+    res
+      .status(500)
+      .json({ message: "Error al obtener los coches", error: err });
   }
 });
 
