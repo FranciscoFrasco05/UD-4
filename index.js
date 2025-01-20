@@ -1,11 +1,21 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+//HELMET
+const helmet = require("helmet");
+
 
 const uri =
   "mongodb+srv://franciscojosesanchezlloret:xzjPV6zXZPpohatw@cluster0.silp3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express();
 app.use(express.json());
+app.use(helmet()); 
+app.use(
+  helmet({
+    hidePoweredBy: true, // Oculta la cabecera X-Powered-By
+    frameguard: { action: "deny" }, // Previene que tu app sea embebida en un iframe
+  })
+);
 
 const port = process.env.PORT || 8080;
 
