@@ -158,6 +158,99 @@ app.post("/concesionarios/:id/coches", async (req, res) => {
   }
 });
 
+//GET /concesionarios/:id/coches/:cocheId →
+// Obtiene el coche cuyo id sea cocheId, del concesionario pasado por id
+// Obtener un coche específico de un concesionario
+// Obtener un coche específico de un concesionario
+app.get("/concesionarios/:id/coches/:cocheId", async (req, res) => {
+  try {
+    const concesionarioId = req.params.id; // ID del concesionario
+    const cocheId = parseInt(req.params.cocheId); // Índice del coche en el array
+
+    // Buscar el concesionario por ID
+    const concesionario = await concesionariosCollection.findOne({
+      _id: new MongoClient.ObjectId(concesionarioId),
+    });
+
+    if (!concesionario) {
+      return res.status(404).json({ message: "Concesionario no encontrado" });
+    }
+
+    // Validar que el coche en el índice especificado existe
+    const coche = concesionario.coches[cocheId];
+    if (!coche) {
+      return res.status(404).json({ message: "Coche no encontrado" });
+    }
+
+    // Responder con los datos del coche
+    res.json(coche);
+  } catch (error) {
+    console.error("Error al obtener el coche:", error);
+    res.status(500).json({ message: "Error del servidor", error });
+  }
+});
+
+//PUT /concesionarios/:id/coches/:cocheId
+// Actualizar un coche específico de un concesionario
+// Actualizar un coche específico de un concesionario
+app.put("/concesionarios/:id/coches/:cocheId", async (req, res) => {
+  try {
+    const concesionarioId = req.params.id; // ID del concesionario
+    const cocheId = parseInt(req.params.cocheId); // Índice del coche en el array
+    const cocheActualizado = req.body; // Datos nuevos del coche
+
+    // Encuentra el concesionario y actualiza el coche en el índice especificado
+    const result = await concesionariosCollection.updateOne(
+      { _id: new MongoClient.ObjectId(concesionarioId) },
+      { $set: { [`coches.${cocheId}`]: cocheActualizado } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Concesionario o coche no encontrado" });
+    }
+
+    res.json({ message: "Coche actualizado exitosamente" });
+  } catch (error) {
+    console.error("Error al actualizar el coche:", error);
+    res.status(500).json({ message: "Error del servidor", error });
+  }
+});
+
+
+//DELETE /concesionarios/:id/coches/:cocheId → Borra el coche cuyo id sea cocheId, del concesionario pasado por id
+// Eliminar un coche específico de un concesionario
+// Eliminar un coche específico de un concesionario
+app.delete("/concesionarios/:id/coches/:cocheId", async (req, res) => {
+  try {
+    const concesionarioId = req.params.id; // ID del concesionario
+    const cocheId = parseInt(req.params.cocheId); // Índice del coche en el array
+
+    // Encuentra el concesionario y elimina el coche en el índice especificado
+    const result = await concesionariosCollection.updateOne(
+      { _id: new MongoClient.ObjectId(concesionarioId) },
+      { $unset: { [`coches.${cocheId}`]: "" } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Concesionario o coche no encontrado" });
+    }
+
+    // Limpia el array eliminando índices vacíos (`null`)
+    await concesionariosCollection.updateOne(
+      { _id: new MongoClient.ObjectId(concesionarioId) },
+      { $pull: { coches: null } }
+    );
+
+    res.json({ message: "Coche eliminado exitosamente" });
+  } catch (error) {
+    console.error("Error al eliminar el coche:", error);
+    res.status(500).json({ message: "Error del servidor", error });
+  }
+});
+
+
+
+
 // Arrancar el servidor
 app.listen(port, () => {
   console.log(`Servidor desplegado en puerto: ${port}`);
