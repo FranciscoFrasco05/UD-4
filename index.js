@@ -2,7 +2,8 @@ const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 //HELMET
 const helmet = require("helmet");
-
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 const uri =
   "mongodb+srv://franciscojosesanchezlloret:xzjPV6zXZPpohatw@cluster0.silp3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -26,6 +27,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 let db, concesionariosCollection;
 
@@ -206,7 +208,9 @@ app.put("/concesionarios/:id/coches/:cocheId", async (req, res) => {
     );
 
     if (result.matchedCount === 0) {
-      return res.status(404).json({ message: "Concesionario o coche no encontrado" });
+      return res
+        .status(404)
+        .json({ message: "Concesionario o coche no encontrado" });
     }
 
     res.json({ message: "Coche actualizado exitosamente" });
@@ -215,7 +219,6 @@ app.put("/concesionarios/:id/coches/:cocheId", async (req, res) => {
     res.status(500).json({ message: "Error del servidor", error });
   }
 });
-
 
 //DELETE /concesionarios/:id/coches/:cocheId → Borra el coche cuyo id sea cocheId, del concesionario pasado por id
 // Eliminar un coche específico de un concesionario
@@ -232,7 +235,9 @@ app.delete("/concesionarios/:id/coches/:cocheId", async (req, res) => {
     );
 
     if (result.matchedCount === 0) {
-      return res.status(404).json({ message: "Concesionario o coche no encontrado" });
+      return res
+        .status(404)
+        .json({ message: "Concesionario o coche no encontrado" });
     }
 
     // Limpia el array eliminando índices vacíos (`null`)
@@ -247,10 +252,6 @@ app.delete("/concesionarios/:id/coches/:cocheId", async (req, res) => {
     res.status(500).json({ message: "Error del servidor", error });
   }
 });
-
-
-
-
 // Arrancar el servidor
 app.listen(port, () => {
   console.log(`Servidor desplegado en puerto: ${port}`);
